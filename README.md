@@ -1,6 +1,6 @@
 # QuantityMeasurementApp-Frontend
 
-This workspace now contains an Angular application in the `quantity-measurement-app` folder.
+
 
 ## Run the Angular app
 
