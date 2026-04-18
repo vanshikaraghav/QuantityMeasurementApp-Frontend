@@ -1,0 +1,58 @@
+<!-- src/app/components/login/login.html -->
+<div class="login-container">
+
+  <div class="login-box">
+
+    <div class="header">
+      <h1>⚖️ QuantityApp</h1>
+      <p>{{ isLogin ? 'Welcome back' : 'Create your account' }}</p>
+    </div>
+
+    <!-- Error Message -->
+    <div class="error-banner" *ngIf="errorMessage">
+      ⚠️ {{ errorMessage }}
+    </div>
+
+    <!-- Username -->
+    <div class="form-group">
+      <label>Username</label>
+      <input
+        type="text"
+        [(ngModel)]="username"
+        placeholder="Enter username"
+        [class.invalid]="usernameError"
+      />
+      <span class="error-text" *ngIf="usernameError">Username must be at least 3 characters</span>
+    </div>
+
+    <!-- Password -->
+    <div class="form-group">
+      <label>Password</label>
+      <input
+        type="password"
+        [(ngModel)]="password"
+        placeholder="Enter password"
+        [class.invalid]="passwordError"
+      />
+      <span class="error-text" *ngIf="passwordError">Password must be at least 4 characters</span>
+    </div>
+
+    <!-- Submit -->
+    <button class="btn-primary" (click)="submit()" [disabled]="loading">
+      <span *ngIf="!loading">{{ isLogin ? '🔐 Login' : '📝 Sign Up' }}</span>
+      <span *ngIf="loading">⏳ Please wait...</span>
+    </button>
+
+    <!-- Toggle -->
+    <div class="toggle-section">
+      <span>{{ isLogin ? "Don't have an account?" : 'Already have an account?' }}</span>
+      <button class="btn-link" (click)="toggle()">
+        {{ isLogin ? 'Sign Up' : 'Login' }}
+      </button>
+    </div>
+
+    <!-- Theme Toggle -->
+    <button class="btn-theme" (click)="toggleTheme()">🌗 Toggle Theme</button>
+
+  </div>
+</div>
