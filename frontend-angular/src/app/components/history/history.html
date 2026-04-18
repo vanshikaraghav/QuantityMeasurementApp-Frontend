@@ -1,0 +1,39 @@
+<!-- src/app/components/history/history.html -->
+<div class="history-container">
+
+  <div class="history-header">
+    <h2>📜 Calculation History</h2>
+    <div class="header-actions">
+      <button class="btn-refresh" (click)="loadHistory()" [disabled]="loading">🔄 Refresh</button>
+      <button class="btn-clear" (click)="clearAll()" *ngIf="history.length > 0">🗑️ Clear All</button>
+      <button class="btn-back" routerLink="/">← Back to Dashboard</button>
+    </div>
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading-state" *ngIf="loading">
+    <p>⏳ Loading history from server...</p>
+  </div>
+
+  <!-- ERROR -->
+  <div class="error-box" *ngIf="errorMessage">
+    ⚠️ {{ errorMessage }}
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div class="empty-state" *ngIf="!loading && !errorMessage && history.length === 0">
+    <p>📭 No calculations yet. Go to the dashboard to get started!</p>
+  </div>
+
+  <!-- HISTORY LIST -->
+  <div class="history-list" *ngIf="!loading && history.length > 0">
+    <div class="history-item" *ngFor="let item of history">
+      <div class="item-content">
+        <span class="operation-badge">{{ item.operation }}</span>
+        <span class="result-text">{{ item.result }}</span>
+      </div>
+      <button class="btn-delete" (click)="deleteEntry(item.id)" title="Delete">✕</button>
+    </div>
+  </div>
+
+</div>

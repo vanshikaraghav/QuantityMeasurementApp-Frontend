@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "quantity-measurement-app": {
+    "quantity-app": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -26,7 +26,8 @@
             ],
             "styles": [
               "src/styles.css"
-            ]
+            ],
+            "outputPath": "dist/quantity-app"
           },
           "configurations": {
             "production": {
@@ -56,10 +57,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "quantity-measurement-app:build:production"
+              "buildTarget": "quantity-app:build:production"
             },
             "development": {
-              "buildTarget": "quantity-measurement-app:build:development"
+              "buildTarget": "quantity-app:build:development"
             }
           },
           "defaultConfiguration": "development"

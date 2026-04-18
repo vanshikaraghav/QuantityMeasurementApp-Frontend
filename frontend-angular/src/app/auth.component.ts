@@ -1,18 +1,31 @@
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
+import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { environment } from '../environments/environment';
+import { AuthService } from './core/services/auth.services';
 
 declare global {
   interface Window {
-    google?: any;
+    google?: GoogleIdentity;
   }
 }
 
-interface StoredUser {
-  name: string;
-  email: string;
-  password: string;
+interface GoogleCredentialResponse {
+  credential?: string;
+}
+
+interface GoogleIdentity {
+  accounts?: {
+    id?: {
+      initialize: (options: {
+        client_id: string;
+        callback: (response: GoogleCredentialResponse) => void;
+      }) => void;
+      renderButton: (element: HTMLElement, options: Record<string, string>) => void;
+    };
+  };
 }
 
 @Component({
@@ -26,6 +39,7 @@ export class AuthComponent implements AfterViewInit {
   @ViewChild('googleSignInContainer', { static: true }) googleSignInContainer?: ElementRef<HTMLDivElement>;
 
   isRegister = false;
+  isSubmitting = false;
   loginEmail = '';
   loginPassword = '';
   registerName = '';
@@ -35,11 +49,14 @@ export class AuthComponent implements AfterViewInit {
   registerError = '';
   googleError = '';
 
-  private readonly GOOGLE_CLIENT_ID = "518513198833-touajoprehvcp9bitk7bv3n8kaauhbd7.apps.googleusercontent.com";
+  private googleButtonRendered = false;
+  private readonly googleClientId = environment.googleClientId;
 
-  constructor(private router: Router) {
-    const user = this.loadCurrentUser();
-    if (user) {
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
+    if (this.authService.isLoggedIn()) {
       this.router.navigate(['/dashboard']);
     }
   }
@@ -57,51 +74,64 @@ export class AuthComponent implements AfterViewInit {
 
   handleLoginSubmit() {
     this.loginError = '';
-    const storedUser = this.getStoredUser();
+    this.googleError = '';
 
-    if (!storedUser || storedUser.email !== this.loginEmail || storedUser.password !== this.loginPassword) {
-      this.loginError = 'Invalid email or password.';
+    if (!this.loginEmail.trim() || !this.loginPassword.trim()) {
+      this.loginError = 'Please enter your email and password.';
       return;
     }
 
-    localStorage.setItem('qmaUser', JSON.stringify({ name: storedUser.name, email: storedUser.email }));
-    this.router.navigate(['/dashboard']);
+    this.isSubmitting = true;
+    this.authService.login({
+      email: this.loginEmail.trim(),
+      password: this.loginPassword
+    }).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isSubmitting = false;
+        this.loginError = this.extractErrorMessage(error, 'Login failed. Please check your credentials.');
+      }
+    });
   }
 
   handleRegisterSubmit() {
     this.registerError = '';
+    this.googleError = '';
 
     if (!this.registerName.trim() || !this.registerEmail.trim() || !this.registerPassword.trim()) {
       this.registerError = 'Please fill out all fields.';
       return;
     }
 
-    const storedUser = this.getStoredUser();
-    if (storedUser && storedUser.email === this.registerEmail.trim()) {
-      this.registerError = 'Email already registered. Please log in.';
-      return;
-    }
-
-    const user: StoredUser = {
+    this.isSubmitting = true;
+    this.authService.register({
       name: this.registerName.trim(),
       email: this.registerEmail.trim(),
       password: this.registerPassword
-    };
-
-    localStorage.setItem('qmaStoredUser', JSON.stringify(user));
-    localStorage.setItem('qmaUser', JSON.stringify({ name: user.name, email: user.email }));
-    this.router.navigate(['/dashboard']);
+    }).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isSubmitting = false;
+        this.registerError = this.extractErrorMessage(error, 'Registration failed. Please try again.');
+      }
+    });
   }
 
   private initGoogleButton(retryCount = 0) {
-    if (!this.googleSignInContainer) {
+    if (!this.googleSignInContainer || this.googleButtonRendered) {
       return;
     }
 
-    if (window.google && window.google.accounts && window.google.accounts.id) {
+    if (window.google?.accounts?.id) {
       window.google.accounts.id.initialize({
-        client_id: this.GOOGLE_CLIENT_ID,
-        callback: (response: any) => this.handleGoogleResponse(response)
+        client_id: this.googleClientId,
+        callback: (response: GoogleCredentialResponse) => this.handleGoogleResponse(response)
       });
 
       window.google.accounts.id.renderButton(this.googleSignInContainer.nativeElement, {
@@ -110,6 +140,7 @@ export class AuthComponent implements AfterViewInit {
         text: 'signin_with',
         shape: 'pill'
       });
+      this.googleButtonRendered = true;
       return;
     }
 
@@ -121,55 +152,40 @@ export class AuthComponent implements AfterViewInit {
     this.googleError = 'Google authentication failed to load. Please refresh the page.';
   }
 
-  private handleGoogleResponse(response: any) {
-    const payload = this.parseJwtToken(response?.credential || '');
-    if (!payload?.email) {
+  private handleGoogleResponse(response: GoogleCredentialResponse) {
+    this.googleError = '';
+
+    if (!response.credential) {
       this.googleError = 'Google sign-in failed. Try again.';
       return;
     }
 
-    const user = {
-      name: payload.name || payload.email,
-      email: payload.email,
-      avatar: payload.picture || ''
-    };
-
-    localStorage.setItem('qmaUser', JSON.stringify(user));
-    this.router.navigate(['/dashboard']);
+    this.isSubmitting = true;
+    this.authService.googleLogin(response.credential).subscribe({
+      next: () => {
+        this.isSubmitting = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.isSubmitting = false;
+        this.googleError = this.extractErrorMessage(error, 'Google sign-in failed. Please try again.');
+      }
+    });
   }
 
-  signInWithGoogle() {
-    if (window.google && window.google.accounts && window.google.accounts.id) {
-      window.google.accounts.id.prompt();
-      return;
+  private extractErrorMessage(error: HttpErrorResponse, fallback: string) {
+    if (typeof error.error === 'string' && error.error.trim()) {
+      return error.error;
     }
 
-    this.googleError = 'Google sign-in is not ready yet. Please refresh the page in a moment.';
-  }
-
-  private parseJwtToken(token: string) {
-    try {
-      const base64 = token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-      const json = decodeURIComponent(atob(base64).split('').map((c) => `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`).join(''));
-      return JSON.parse(json);
-    } catch {
-      return null;
+    if (error.error?.message) {
+      return error.error.message;
     }
-  }
 
-  private loadCurrentUser() {
-    try {
-      return JSON.parse(localStorage.getItem('qmaUser') || 'null');
-    } catch {
-      return null;
+    if (error.status === 0) {
+      return 'Authentication service is unavailable. Make sure the backend is running.';
     }
-  }
 
-  private getStoredUser(): StoredUser | null {
-    try {
-      return JSON.parse(localStorage.getItem('qmaStoredUser') || 'null');
-    } catch {
-      return null;
-    }
+    return fallback;
   }
 }

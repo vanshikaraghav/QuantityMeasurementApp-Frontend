@@ -15,9 +15,9 @@
         </div>
         <div class="form-group">
           <label for="loginPassword">Password</label>
-          <input id="loginPassword" type="password" [(ngModel)]="loginPassword" name="loginPassword" required placeholder="••••••••" />
+          <input id="loginPassword" type="password" [(ngModel)]="loginPassword" name="loginPassword" required placeholder="Enter password" />
         </div>
-        <button type="submit" class="submit-btn">Sign In</button>
+        <button type="submit" class="submit-btn" [disabled]="isSubmitting">Sign In</button>
       </form>
 
       <div class="toggle-section">
@@ -40,9 +40,9 @@
         </div>
         <div class="form-group">
           <label for="registerPassword">Password</label>
-          <input id="registerPassword" type="password" [(ngModel)]="registerPassword" name="registerPassword" required placeholder="••••••••" />
+          <input id="registerPassword" type="password" [(ngModel)]="registerPassword" name="registerPassword" required placeholder="Create password" />
         </div>
-        <button type="submit" class="submit-btn">Register</button>
+        <button type="submit" class="submit-btn" [disabled]="isSubmitting">Register</button>
       </form>
 
       <div class="toggle-section">

@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from './core/services/auth.services';
 
 type MeasureType = 'length' | 'weight' | 'temperature' | 'volume';
 type UnitMap = Record<string, number | string>;
@@ -42,10 +43,10 @@ export class DashboardComponent {
   history: string[] = [];
 
   readonly types: { key: MeasureType; label: string; icon: string }[] = [
-    { key: 'length', label: 'Length', icon: '📏' },
-    { key: 'weight', label: 'Weight', icon: '⚖️' },
-    { key: 'temperature', label: 'Temperature', icon: '🌡️' },
-    { key: 'volume', label: 'Volume', icon: '🧪' }
+    { key: 'length', label: 'Length', icon: 'L' },
+    { key: 'weight', label: 'Weight', icon: 'W' },
+    { key: 'temperature', label: 'Temperature', icon: 'T' },
+    { key: 'volume', label: 'Volume', icon: 'V' }
   ];
 
   readonly actions = [
@@ -115,19 +116,22 @@ export class DashboardComponent {
     }
   };
 
-  constructor(private router: Router) {
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {
     this.initializeDefaults();
     this.history = this.loadHistory();
     this.refreshAll(false);
   }
 
   get userName() {
-    const user = this.loadCurrentUser();
+    const user = this.authService.getCurrentUser();
     return user?.name || '';
   }
 
   get userEmail() {
-    return this.loadCurrentUser()?.email || 'guest';
+    return this.authService.getCurrentUser()?.email || 'guest';
   }
 
   private get historyStorageKey() {
@@ -135,7 +139,7 @@ export class DashboardComponent {
   }
 
   get isLoggedIn() {
-    return Boolean(this.loadCurrentUser());
+    return this.authService.isLoggedIn();
   }
 
   get unitNames() {
@@ -177,7 +181,7 @@ export class DashboardComponent {
     const value = Number(this.conversionInput || 0);
     const converted = this.convertValue(value, this.conversionFromUnit, this.conversionToUnit);
     this.conversionResult = this.formatNumber(converted);
-    this.addHistoryEntry(`Conversion: ${this.formatNumber(value)} ${this.conversionFromUnit} → ${this.conversionResult} ${this.conversionToUnit}`);
+    this.addHistoryEntry(`Conversion: ${this.formatNumber(value)} ${this.conversionFromUnit} -> ${this.conversionResult} ${this.conversionToUnit}`);
   }
 
   updateArithmetic() {
@@ -191,8 +195,8 @@ export class DashboardComponent {
     const first = this.convertValue(v1, unit1, targetUnit);
     const second = this.convertValue(v2, unit2, targetUnit);
     let result: number;
-    
-    switch(operator) {
+
+    switch (operator) {
       case '+':
         result = first + second;
         break;
@@ -225,7 +229,7 @@ export class DashboardComponent {
   }
 
   logout() {
-    localStorage.removeItem('qmaUser');
+    this.authService.logout();
     this.router.navigate(['/auth']);
   }
 
@@ -257,17 +261,15 @@ export class DashboardComponent {
     }
   }
 
-  private loadCurrentUser() {
-    try {
-      return JSON.parse(localStorage.getItem('qmaUser') || 'null');
-    } catch {
-      return null;
-    }
-  }
-
-  private refreshAll(_shouldRecord = false) {
+  private refreshAll(shouldRecord = false) {
+    const previousHistory = this.history;
     this.updateComparison();
     this.updateConversion();
     this.updateArithmetic();
+
+    if (!shouldRecord) {
+      this.history = previousHistory;
+      localStorage.setItem(this.historyStorageKey, JSON.stringify(previousHistory));
+    }
   }
 }

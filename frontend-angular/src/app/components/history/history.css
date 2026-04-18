@@ -1,0 +1,19 @@
+.history-container { max-width:750px; margin:0 auto; padding:30px 20px; }
+.history-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; margin-bottom:24px; }
+.history-header h2 { font-size:22px; font-weight:700; }
+.header-actions { display:flex; gap:8px; flex-wrap:wrap; }
+.header-actions button { padding:8px 14px; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.08); color:white; font-size:13px; transition:background .2s; }
+.header-actions button:hover { background:rgba(255,255,255,0.18); }
+.header-actions button:disabled { opacity:.5; cursor:not-allowed; }
+.btn-clear { background:rgba(239,68,68,0.2) !important; border-color:rgba(239,68,68,0.35) !important; color:#fca5a5 !important; }
+.loading-state,.empty-state { text-align:center; padding:60px 20px; opacity:.6; font-size:15px; }
+.error-box { padding:14px 18px; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.3); border-radius:12px; color:#fca5a5; font-size:14px; margin-bottom:14px; }
+.history-list { display:flex; flex-direction:column; gap:10px; }
+.history-item { display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:14px 18px; animation:fadeIn .3s ease; transition:background .2s; }
+.history-item:hover { background:rgba(255,255,255,0.11); }
+.item-content { display:flex; align-items:center; gap:12px; flex-wrap:wrap; flex:1; }
+.operation-badge { background:rgba(99,102,241,0.25); border:1px solid rgba(99,102,241,0.4); color:#a5b4fc; padding:3px 10px; border-radius:20px; font-size:11px; font-weight:700; text-transform:uppercase; white-space:nowrap; }
+.result-text { font-size:14px; opacity:.82; }
+.btn-delete { background:rgba(239,68,68,0.15); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; width:30px; height:30px; padding:0; border-radius:8px; font-size:13px; flex-shrink:0; }
+.btn-delete:hover { background:rgba(239,68,68,0.3); }
+@keyframes fadeIn { from{opacity:0;transform:translateX(-8px)} to{opacity:1;transform:translateX(0)} }

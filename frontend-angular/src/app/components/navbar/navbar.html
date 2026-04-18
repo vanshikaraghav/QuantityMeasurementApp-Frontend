@@ -1,0 +1,9 @@
+<nav class="navbar">
+  <div class="nav-brand" (click)="goHome()">⚖️ QuantityApp</div>
+  <div class="nav-right">
+    <span class="nav-user" *ngIf="isLoggedIn && currentUser">👤 {{ currentUser.username }}</span>
+    <button class="btn-theme" (click)="toggleTheme()">🌗</button>
+    <button class="btn-login" *ngIf="!isLoggedIn" (click)="goToLogin()">🔐 Login</button>
+    <button class="btn-logout" *ngIf="isLoggedIn" (click)="logout()">Logout</button>
+  </div>
+</nav>
