@@ -1,0 +1,63 @@
+<app-navbar></app-navbar>
+<div class="dashboard-container">
+
+  <div class="dash-header">
+    <h2>⚖️ Quantity Calculator</h2>
+    <button class="btn-history" (click)="goToHistory()">📜 History</button>
+  </div>
+
+  <div class="type-tabs">
+    <button *ngFor="let t of ['Length','Weight','Volume','Temperature']"
+            [class.active]="activeType === t" (click)="setType(t)">{{ t }}</button>
+  </div>
+
+  <div class="action-tabs">
+    <button *ngFor="let a of availableActions"
+            [class.active]="activeAction === a"
+            (click)="activeAction = a; result = null; errorMessage = ''">{{ a }}</button>
+  </div>
+
+  <div class="calc-form">
+    <div class="form-row">
+      <label>Value 1</label>
+      <input type="number" [(ngModel)]="value1" placeholder="0" />
+      <select [(ngModel)]="from">
+        <option *ngFor="let u of unitsMap[activeType]" [value]="u">{{ u }}</option>
+      </select>
+    </div>
+
+    <div class="form-row" *ngIf="activeAction === 'Arithmetic'">
+      <label>Operator</label>
+      <div class="operator-btns">
+        <button *ngFor="let op of ['+','-','/']"
+                [class.active]="operator === op" (click)="operator = op">{{ op }}</button>
+      </div>
+    </div>
+
+    <div class="form-row" *ngIf="activeAction !== 'Conversion'">
+      <label>Value 2</label>
+      <input type="number" [(ngModel)]="value2" placeholder="0" />
+      <select [(ngModel)]="to">
+        <option *ngFor="let u of unitsMap[activeType]" [value]="u">{{ u }}</option>
+      </select>
+    </div>
+
+    <div class="form-row" *ngIf="activeAction === 'Conversion'">
+      <label>Convert To</label>
+      <select [(ngModel)]="to">
+        <option *ngFor="let u of unitsMap[activeType]" [value]="u">{{ u }}</option>
+      </select>
+    </div>
+
+    <button class="btn-calculate" (click)="calculate()" [disabled]="loading">
+      {{ loading ? '⏳ Calculating...' : '⚡ Calculate' }}
+    </button>
+  </div>
+
+  <div class="result-box" *ngIf="result !== null && !errorMessage">
+    <p class="result-label">Result</p>
+    <p class="result-value">{{ result }}</p>
+  </div>
+
+  <div class="error-box" *ngIf="errorMessage">⚠️ {{ errorMessage }}</div>
+</div>
