@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'REPLACE_WITH_YOUR_GATEWAY_URL'
+  apiUrl: 'https://quantitymeasurementapp-api-gateway-gr0y.onrender.com'
 };
