@@ -1,5 +1,5 @@
 // src/environments/environment.ts
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8080'  // API Gateway URL
+  apiUrl: 'https://quantitymeasurementapp-api-gateway-gr0y.onrender.com'  // API Gateway URL
 };
