@@ -1,0 +1,23 @@
+.login-container { min-height:100vh; display:flex; justify-content:center; align-items:center; padding:20px; }
+.login-box { background:rgba(255,255,255,0.1); backdrop-filter:blur(16px); border:1px solid rgba(255,255,255,0.2); border-radius:20px; padding:40px 36px; width:100%; max-width:420px; animation:fadeIn .5s ease; box-shadow:0 8px 32px rgba(0,0,0,0.3); }
+.header { text-align:center; margin-bottom:24px; }
+.header h1 { font-size:26px; font-weight:700; margin-bottom:4px; }
+.header p { font-size:14px; opacity:.7; }
+.back-btn { background:none; border:none; color:rgba(255,255,255,0.6); font-size:13px; padding:0; margin-bottom:16px; display:block; }
+.back-btn:hover { color:white; }
+.error-banner { background:rgba(239,68,68,0.2); border:1px solid rgba(239,68,68,0.4); border-radius:10px; padding:10px 14px; margin-bottom:16px; font-size:13px; color:#fca5a5; }
+.form-group { margin-bottom:18px; display:flex; flex-direction:column; }
+.form-group label { font-size:13px; font-weight:500; margin-bottom:6px; opacity:.8; }
+.form-group input { padding:12px 14px; border-radius:10px; border:1.5px solid rgba(255,255,255,0.2); background:rgba(255,255,255,0.1); color:white; font-size:14px; outline:none; transition:border .2s; }
+.form-group input::placeholder { color:rgba(255,255,255,0.35); }
+.form-group input:focus { border-color:#6366f1; }
+.form-group input.invalid { border-color:#ef4444; }
+.error-text { font-size:11px; color:#fca5a5; margin-top:4px; }
+.btn-primary { width:100%; padding:13px; border-radius:10px; border:none; background:linear-gradient(135deg,#6366f1,#3b82f6); color:white; font-size:15px; font-weight:600; transition:opacity .2s,transform .2s; margin-top:6px; }
+.btn-primary:hover:not(:disabled) { opacity:.9; transform:translateY(-1px); }
+.btn-primary:disabled { opacity:.55; cursor:not-allowed; }
+.toggle-section { display:flex; justify-content:center; align-items:center; gap:6px; margin-top:18px; font-size:13px; opacity:.8; flex-wrap:wrap; }
+.btn-link { background:none; border:none; color:#93c5fd; font-size:13px; font-weight:600; text-decoration:underline; padding:0; }
+.btn-link:hover { color:white; }
+.btn-theme { display:block; margin:16px auto 0; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:white; font-size:12px; padding:7px 16px; border-radius:20px; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
